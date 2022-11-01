@@ -24,7 +24,6 @@ public class GameMatcher implements Runnable {
 
     public static void addClient(ClientHandler client) {
         instance.clientList.add(client);
-        instance.notify();
     }
 
     @Override
@@ -34,9 +33,15 @@ public class GameMatcher implements Runnable {
                 if (clientList.size() >= 2) {
                     ClientHandler a = clientList.remove(0);
                     ClientHandler b = clientList.remove(0);
+                    a.sendLine(String.format("start.%s.1", b.name));
+                    b.sendLine(String.format("start.%s.2", a.name));
                     GameHandler game = new GameHandler(a, b);
+                    a.setGameHandler(game);
+                    a.color = 1;
+                    b.setGameHandler(game);
+                    b.color = 2;
                 } else {
-                    wait();
+                    Thread.sleep(1000);
                 }
             }
         } catch (InterruptedException e) {

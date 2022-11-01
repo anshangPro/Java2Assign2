@@ -1,5 +1,6 @@
 package application.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Pane;
@@ -24,6 +25,12 @@ public class Controller implements Initializable {
     @FXML
     private Rectangle game_panel;
 
+    public void setClientController(ClientController clientController) {
+        this.clientController = clientController;
+    }
+
+    private ClientController clientController;
+
     private static boolean TURN = false;
 
     private static final int[][] chessBoard = new int[3][3];
@@ -42,12 +49,25 @@ public class Controller implements Initializable {
 
     private boolean refreshBoard (int x, int y) {
         if (chessBoard[x][y] == EMPTY) {
+            clientController.play(TURN, x, y);
             chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
             drawChess();
             return true;
         }
         return false;
     }
+
+    public void refreshBoard(boolean turn, int x, int y) {
+        chessBoard[x][y] = turn ? PLAY_1 : PLAY_2;
+        Platform.runLater(this::drawChess);
+        TURN = !turn;
+    }
+
+    public void initial(boolean turn){
+        TURN = turn;
+    }
+
+//    public boolean
 
     private void drawChess () {
         for (int i = 0; i < chessBoard.length; i++) {

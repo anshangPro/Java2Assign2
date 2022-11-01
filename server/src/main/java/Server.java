@@ -1,3 +1,5 @@
+import Handler.ClientHandler;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -33,6 +35,9 @@ public class Server implements Runnable {
             while (running) {
                 Socket socket = server.accept();
                 System.out.printf("Client connected at port: %d\n", socket.getLocalPort());
+                ClientHandler client = new ClientHandler(socket);
+                Thread clientThread = new Thread(client);
+                clientThread.start();
             }
         } catch (IOException e){
             System.out.println(e.getMessage());
