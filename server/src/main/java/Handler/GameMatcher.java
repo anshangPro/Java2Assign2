@@ -26,6 +26,10 @@ public class GameMatcher implements Runnable {
         instance.clientList.add(client);
     }
 
+    public static void removeClient(ClientHandler client) {
+        instance.clientList.remove(client);
+    }
+
     @Override
     public void run() {
         try {
@@ -41,6 +45,9 @@ public class GameMatcher implements Runnable {
                     b.setGameHandler(game);
                     b.color = 2;
                 } else {
+                    if (clientList.size() == 1 && !clientList.get(0).informed) {
+                        clientList.get(0).inform();
+                    }
                     Thread.sleep(1000);
                 }
             }

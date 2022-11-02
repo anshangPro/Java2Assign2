@@ -1,4 +1,6 @@
-package application.controller;
+package application.Controller;
+
+import application.View.AlertWindow;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,6 +20,11 @@ public class ClientController implements Runnable {
     BufferedReader reader;
     PrintStream printer;
     private boolean running;
+
+    public boolean isStarted() {
+        return started;
+    }
+
     private boolean started;
     private Controller controller;
 
@@ -66,7 +73,21 @@ public class ClientController implements Runnable {
                 this.started = true;
                 controller.initial(selfColor == CIRCLE);
                 System.out.printf("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName);
+                AlertWindow.show(String.format("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName));
                 break;
+            case("success"): //success.{playerID}
+//                System.out.printf("Player: %s win\n", msg[1]);
+                AlertWindow.show(String.format("Player: %s win", msg[1]));
+                break;
+            case("exit"):
+//                System.out.println("opposite exited");
+                AlertWindow.show("opposite exited");
+                break;
+            case("wait"):
+//                System.out.println("waiting for opposite");
+                AlertWindow.show("Waiting for opposite");
+            case("tie"):
+                AlertWindow.show("Tie");
         }
     }
 
@@ -81,11 +102,11 @@ public class ClientController implements Runnable {
         try {
             while (running) {
                 String in = reader.readLine();
-                System.out.println(in);
+//                System.out.println(in);
                 resolve(in);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("socket closed");
         }
     }
 }

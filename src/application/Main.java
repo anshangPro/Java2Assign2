@@ -1,12 +1,14 @@
 package application;
 
-import application.controller.ClientController;
-import application.controller.Controller;
+import application.Controller.ClientController;
+import application.Controller.Controller;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Main extends Application {
     @Override
@@ -25,8 +27,14 @@ public class Main extends Application {
 
             Thread clientThread = new Thread(client);
             clientThread.start();
-            System.out.println(114);
             primaryStage.show();
+
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    client.stop();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

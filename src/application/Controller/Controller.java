@@ -1,4 +1,4 @@
-package application.controller;
+package application.Controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -48,7 +48,10 @@ public class Controller implements Initializable {
     }
 
     private boolean refreshBoard (int x, int y) {
+        if (!clientController.isStarted())
+            return false;
         if (chessBoard[x][y] == EMPTY) {
+            if (TURN != (clientController.selfColor == 1)) return false;
             clientController.play(TURN, x, y);
             chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
             drawChess();

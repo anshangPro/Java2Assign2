@@ -15,6 +15,7 @@ public class ClientHandler implements Runnable{
     PrintStream printer;
     String name;
     int color;
+    boolean informed;
 
     public void setGameHandler(GameHandler gameHandler) {
         this.gameHandler = gameHandler;
@@ -29,6 +30,7 @@ public class ClientHandler implements Runnable{
             this.outputStream = socket.getOutputStream();
             this.reader = new BufferedReader(new InputStreamReader(inputStream));
             this.printer = new PrintStream(outputStream);
+            this.informed = false;
 
             GameMatcher.addClient(this);
         } catch (IOException e) {
@@ -37,6 +39,7 @@ public class ClientHandler implements Runnable{
     }
 
     private void read(String in) {
+        if (in == null) return;
         String[] msg = in.split("\\.");
         switch (msg[0]) {
             case("play"): // play.{step}.{playerID}.{loc[0]}.{loc[1]}
@@ -48,6 +51,11 @@ public class ClientHandler implements Runnable{
                 sendLine("Hi there");
                 break;
         }
+    }
+
+    protected void inform() {
+        this.informed = true;
+        sendLine("wait");
     }
 
     protected void send(String out) {
@@ -65,11 +73,14 @@ public class ClientHandler implements Runnable{
         try {
             while (true) {
                 String in = reader.readLine();
-                System.out.println(in);
+                if (in == null) throw new IOException();
+//                System.out.println(in);
                 read(in);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (gameHandler != null)  gameHandler.exit(color);
+            GameMatcher.removeClient(this);
+            System.out.printf("Player: %s-%d exited", name, color);
         }
     }
 }
