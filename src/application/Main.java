@@ -33,6 +33,7 @@ public class Main extends Application {
                 @Override
                 public void handle(WindowEvent event) {
                     client.stop();
+                    clientThread.interrupt();
                 }
             });
         } catch (Exception e) {

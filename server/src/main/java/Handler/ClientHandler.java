@@ -80,7 +80,7 @@ public class ClientHandler implements Runnable{
         } catch (IOException e) {
             if (gameHandler != null)  gameHandler.exit(color);
             GameMatcher.removeClient(this);
-            System.out.printf("Player: %s-%d exited", name, color);
+            System.out.printf("Player: %s-%d exited\n", name, color);
         }
     }
 }

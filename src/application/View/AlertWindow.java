@@ -1,6 +1,7 @@
 package application.View;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,6 +18,7 @@ public class AlertWindow {
         stage.initModality(Modality.WINDOW_MODAL);
         Label label = new Label(info);
         label.setWrapText(true);
+        label.setPadding(new Insets(5, 20, 5, 20));
         VBox vBox = new VBox();
         vBox.getChildren().add(label);
         vBox.setAlignment(Pos.CENTER);

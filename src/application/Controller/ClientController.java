@@ -46,6 +46,7 @@ public class ClientController implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("can not establish connection with server");
+            running = false;
         }
     }
 
@@ -86,8 +87,10 @@ public class ClientController implements Runnable {
             case("wait"):
 //                System.out.println("waiting for opposite");
                 AlertWindow.show("Waiting for opposite");
+                break;
             case("tie"):
                 AlertWindow.show("Tie");
+                break;
         }
     }
 
