@@ -2,6 +2,7 @@ package application;
 
 import application.Controller.ClientController;
 import application.Controller.Controller;
+import application.View.LoginWindow;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -20,6 +21,7 @@ public class Main extends Application {
             Pane root = fxmlLoader.load();
             Controller controller = fxmlLoader.getController();
             ClientController client = new ClientController("ClientA", controller);
+            LoginWindow.show(client);
             controller.setClientController(client);
             primaryStage.setTitle("Tic Tac Toe");
             primaryStage.setScene(new Scene(root));

@@ -39,7 +39,7 @@ public class ClientController implements Runnable {
             this.outputStream = socket.getOutputStream();
             this.reader = new BufferedReader(new InputStreamReader(inputStream));
             this.printer = new PrintStream(outputStream);
-            printer.printf("Hello.%s\n", name);
+            printer.println("Hello");
             printer.flush();
             if (!reader.readLine().equals("Hi there")) {
                 stop();
@@ -50,6 +50,18 @@ public class ClientController implements Runnable {
         }
     }
 
+    public boolean login(String name, String passwd) {
+        printer.printf("login.%s.%s\n", name, passwd);
+        printer.flush();
+        return true;
+    }
+
+    public boolean register(String name, String passwd) {
+        printer.printf("register.%s.%s\n", name, passwd);
+        printer.flush();
+        return true;
+    }
+
     public void stop() {
         running = false;
         try {
@@ -58,17 +70,18 @@ public class ClientController implements Runnable {
             this.reader.close();
             this.printer.close();
             this.socket.close();
-        } catch (IOException ignored) {}
+        } catch (IOException | NullPointerException ignored) {
+        }
     }
 
     private void resolve(String in) {
         String[] msg = in.split("\\.");
         switch (msg[0]) {
-            case("play"): // play.{step}.{playerID}.{loc[0]}.{loc[1]}
+            case ("play"): // play.{step}.{playerID}.{loc[0]}.{loc[1]}
                 controller.refreshBoard(msg[2].equals("1"), Integer.parseInt(msg[3]),
                         Integer.parseInt(msg[4]));
                 break;
-            case("start"): //start.{opposite}.{color}
+            case ("start"): //start.{opposite}.{color}
                 this.selfColor = Integer.parseInt(msg[2]);
                 this.oppositeName = msg[1];
                 this.started = true;
@@ -76,20 +89,30 @@ public class ClientController implements Runnable {
                 System.out.printf("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName);
                 AlertWindow.show(String.format("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName));
                 break;
-            case("success"): //success.{playerID}
+            case ("success"): //success.{playerID}
 //                System.out.printf("Player: %s win\n", msg[1]);
                 AlertWindow.show(String.format("Player: %s win", msg[1]));
                 break;
-            case("exit"):
+            case ("exit"):
 //                System.out.println("opposite exited");
                 AlertWindow.show("opposite exited");
                 break;
-            case("wait"):
+            case ("wait"):
 //                System.out.println("waiting for opposite");
                 AlertWindow.show("Waiting for opposite");
                 break;
-            case("tie"):
+            case ("tie"):
                 AlertWindow.show("Tie");
+                break;
+            case ("login"):
+                if (msg[1].equals("success")){
+                    this.name = msg[2];
+                    //TODO: inform close;
+                } else{
+                    //TODO: fail
+                }
+                break;
+            case("register"):
                 break;
         }
     }
@@ -101,7 +124,6 @@ public class ClientController implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Waiting for connection");
         try {
             while (running) {
                 String in = reader.readLine();
