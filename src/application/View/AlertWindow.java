@@ -1,6 +1,7 @@
 package application.View;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class AlertWindow {
 
@@ -27,6 +29,10 @@ public class AlertWindow {
         stage.setScene(scene);
         stage.setTitle("info");
         stage.show();
+    }
+
+    public static void setOnExit(EventHandler<WindowEvent> value){
+        Platform.runLater(() -> stageW.setOnCloseRequest(value));
     }
 
     public static void close() {

@@ -9,4 +9,6 @@ public class User implements Serializable {
     public int winCnt = 0;
     public int totalCnt = 0;
     public UUID uuid = UUID.randomUUID();
+    public UUID save = null;
+    public int color;
 }

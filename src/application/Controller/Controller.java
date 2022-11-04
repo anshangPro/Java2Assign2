@@ -8,8 +8,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -33,8 +37,11 @@ public class Controller implements Initializable {
 
     private static boolean TURN = false;
 
-    private static final int[][] chessBoard = new int[3][3];
-    private static final boolean[][] flag = new boolean[3][3];
+    private int[][] chessBoard = new int[3][3];
+    private boolean[][] flag = new boolean[3][3];
+
+    private List<Circle> addC = new ArrayList<>();
+    private List<Line> addL = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,8 +73,17 @@ public class Controller implements Initializable {
         TURN = !turn;
     }
 
-    public void initial(boolean turn){
+    public void initial(boolean turn, boolean[][] flagIn, int[][] board){
         TURN = turn;
+        for (Line l: addL){
+            base_square.getChildren().remove(l);
+        }
+        for (Circle c: addC){
+            base_square.getChildren().remove(c);
+        }
+        chessBoard = board;
+        flag = new boolean[3][3];
+        drawChess();
     }
 
 //    public boolean
@@ -98,6 +114,7 @@ public class Controller implements Initializable {
 
     private void drawCircle (int i, int j) {
         Circle circle = new Circle();
+        addC.add(circle);
         base_square.getChildren().add(circle);
         circle.setCenterX(i * BOUND + BOUND / 2.0 + OFFSET);
         circle.setCenterY(j * BOUND + BOUND / 2.0 + OFFSET);
@@ -110,6 +127,8 @@ public class Controller implements Initializable {
     private void drawLine (int i, int j) {
         Line line_a = new Line();
         Line line_b = new Line();
+        addL.add(line_a);
+        addL.add(line_b);
         base_square.getChildren().add(line_a);
         base_square.getChildren().add(line_b);
         line_a.setStartX(i * BOUND + OFFSET * 1.5);

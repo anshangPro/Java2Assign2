@@ -1,5 +1,7 @@
 package Handler;
 
+import java.util.UUID;
+
 public class GameHandler {
 
     private static final int CIRCLE = 1;
@@ -10,12 +12,17 @@ public class GameHandler {
     private int step;
 
     private int[][] board = new int[3][3];
+    private boolean turn;
+    public UUID uuid = UUID.randomUUID();
+    public boolean exited = false;
+    private boolean finished = false;
 
 
     public GameHandler(ClientHandler a, ClientHandler b){
         this.a = a;
         this.b = b;
         step = 0;
+        turn = false;
     }
 
     public void play(int player, int x, int y, int from) {
@@ -38,20 +45,54 @@ public class GameHandler {
                 b.user.totalCnt++;
                 a.user.totalCnt++;
             }
+            GameMatcher.gameOver(this);
+            finished = true;
         } else if (step == 9) {
             a.sendLine("tie");
             b.sendLine("tie");
             a.user.totalCnt++;
             b.user.totalCnt++;
+            GameMatcher.gameOver(this);
+            finished = true;
         }
+        turn = !turn;
     }
 
     public void exit(int player) {
-        if (player == 1) {
-            b.sendLine("exit");
+        if (!exited && !finished){
+            exited = true;
+            if (player == 1) {
+                a.user.save = uuid;
+                b.sendLine("exit");
+            } else {
+                b.user.save = uuid;
+                a.sendLine("exit");
+            }
+        } else GameMatcher.gameOver(this);
+    }
+
+    public void resume(ClientHandler client) {
+        exited = false;
+        if (client.user.color == 1) {
+            a = client;
+            b.printer.println("reconnect");
+            b.printer.flush();
         } else {
-            a.sendLine("exit");
+            b = client;
+            a.printer.println("reconnect");
+            a.printer.flush();
         }
+        client.printer.println("resume");
+        client.printer.println(turn ? "1" : "0");
+        client.printer.println(client.user.color);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                client.printer.print(board[i][j]);
+                client.printer.print(' ');
+            }
+        }
+        client.printer.println();
+        client.printer.flush();
     }
 
     public boolean judge(int player) {

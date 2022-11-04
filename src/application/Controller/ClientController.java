@@ -2,6 +2,7 @@ package application.Controller;
 
 import application.Main;
 import application.View.*;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.net.Socket;
@@ -91,7 +92,7 @@ public class ClientController implements Runnable {
                 this.selfColor = Integer.parseInt(msg[2]);
                 this.oppositeName = msg[1];
                 this.started = true;
-                controller.initial(selfColor == CIRCLE);
+                controller.initial(false, new boolean[3][3], new int[3][3]);
                 System.out.printf("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName);
                 AlertWindow.show(String.format("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName));
                 UserListWindow.close();
@@ -99,8 +100,15 @@ public class ClientController implements Runnable {
                 break;
             case ("success"): //success.{playerID}
 //                System.out.printf("Player: %s win\n", msg[1]);
-                AlertWindow.show(String.format("Player: %s win", msg[1]));
                 finished = true;
+                if (Integer.parseInt(msg[1]) == selfColor) {
+                    AlertWindow.show(String.format("Player: %s win\nYou win!!", name));
+                    winCnt++;
+                } else {
+                    AlertWindow.show(String.format("Player: %s win\nYou lose.", oppositeName));
+                }
+                totalCnt++;
+                restart();
                 break;
             case ("exit"):
 //                System.out.println("opposite exited");
@@ -113,6 +121,8 @@ public class ClientController implements Runnable {
             case ("tie"):
                 AlertWindow.show("Tie");
                 finished = true;
+                totalCnt++;
+                restart();
                 break;
             case ("login"):
                 if (msg[1].equals("success")){
@@ -121,6 +131,9 @@ public class ClientController implements Runnable {
                     this.totalCnt = Integer.parseInt(msg[4]);
                     LoginWindow.close();
                     StartWindow.show(this);
+                    if (msg[5].equals("1")) {
+                        ResumeWindow.show(this);
+                    }
                 } else{
                     AlertWindow.show("Login failed");
                 }
@@ -138,7 +151,42 @@ public class ClientController implements Runnable {
             case("invite"):
                 InviteWindow.show(this, msg[1], msg[2]);
                 break;
+            case("resume"):
+                this.started = true;
+                Main.showGame();
+                StartWindow.close();
+                loadData();
+                break;
+            case("reconnect"):
+                AlertWindow.show("opposite reconnected");
+                System.out.println("re");
+                break;
         }
+    }
+
+    public void loadData() {
+        try {
+            boolean turn = reader.readLine().equals("1");
+            selfColor = Integer.parseInt(reader.readLine());
+            int[][] board = new int[3][3];
+            boolean[][] flag = new boolean[3][3];
+            int cnt = 0;
+            String[] b = reader.readLine().split(" ");
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    board[i][j] = Integer.parseInt(b[cnt++]);
+                    flag[i][j] = board[i][j] != 0;
+                }
+            }
+            Platform.runLater(() -> controller.initial(turn, flag, board));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void resume() {
+        printer.println("resume");
+        printer.flush();
     }
 
     public void play(boolean turn, int x, int y) {
@@ -202,5 +250,13 @@ public class ClientController implements Runnable {
         } catch (IOException e) {
             System.out.println("socket closed");
         }
+    }
+
+    private void restart() {
+        AlertWindow.setOnExit(event -> {
+            Main.close();
+            StartWindow.show(this);
+            finished = false;
+        });
     }
 }

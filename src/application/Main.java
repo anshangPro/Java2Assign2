@@ -43,6 +43,10 @@ public class Main extends Application {
         }
     }
 
+    public static void close() {
+        Platform.runLater(() -> stage.hide());
+    }
+
     public static void showGame(){
         if (stage != null) {
             Platform.runLater(() -> stage.show());

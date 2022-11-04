@@ -13,6 +13,7 @@ public class GameMatcher {
     private GameMatcher() {
         clientList = new HashMap<>();
     }
+    private static HashMap<UUID, GameHandler> games = new HashMap<>();
 
     private volatile static GameMatcher instance;
 
@@ -60,10 +61,25 @@ public class GameMatcher {
         GameHandler game = new GameHandler(client, opposite);
         client.color = 1;
         opposite.color = 2;
+        client.user.color = 1;
+        opposite.user.color = 1;
         client.setGameHandler(game);
         opposite.setGameHandler(game);
         removeClient(client);
         removeClient(opposite);
+        games.put(game.uuid, game);
+    }
+
+    public static void gameOver(GameHandler gameHandler) {
+        games.remove(gameHandler.uuid);
+    }
+
+    public static boolean contains(UUID uuid) {
+        return games.containsKey(uuid);
+    }
+
+    public static GameHandler getGame(UUID uuid) {
+        return games.get(uuid);
     }
 
 /*    @Override

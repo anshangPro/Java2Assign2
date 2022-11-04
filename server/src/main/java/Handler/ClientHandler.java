@@ -3,10 +3,9 @@ package Handler;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.UUID;
 
 import Serializable.User;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
 
 public class ClientHandler implements Runnable{
 
@@ -22,6 +21,7 @@ public class ClientHandler implements Runnable{
     User user;
     int color;
     boolean informed;
+    UUID uuidSave;
 
     public void setGameHandler(GameHandler gameHandler) {
         this.gameHandler = gameHandler;
@@ -55,7 +55,10 @@ public class ClientHandler implements Runnable{
                 break;
             case("login"):
                 if (login(msg[1], msg[2])) {
-                    sendLine(String.format("login.success.%s.%d.%d", msg[1], user.winCnt, user.totalCnt)); // login.success.{name}.{winCnt}.{totalCnt}
+                    boolean resume = user.save != null && GameMatcher.contains(user.save);
+                    sendLine(String.format("login.success.%s.%d.%d.%d", msg[1], user.winCnt, user.totalCnt, resume ? 1 : 0)); // login.success.{name}.{winCnt}.{totalCnt}
+                    uuidSave = user.save;
+                    user.save = null;
                     this.name = msg[1];
                 } else sendLine("login.fail");
                 break;
@@ -75,6 +78,11 @@ public class ClientHandler implements Runnable{
                 break;
             case("accept"):
                 GameMatcher.accept(msg[1], this);
+                break;
+            case("resume"):
+                color = user.color;
+                gameHandler = GameMatcher.getGame(uuidSave);
+                gameHandler.resume(this);
                 break;
         }
     }
