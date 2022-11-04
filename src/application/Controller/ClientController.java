@@ -1,12 +1,11 @@
 package application.Controller;
 
 import application.Main;
-import application.View.AlertWindow;
-import application.View.LoginWindow;
-import application.View.StartWindow;
+import application.View.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class ClientController implements Runnable {
 
@@ -59,16 +58,14 @@ public class ClientController implements Runnable {
         }
     }
 
-    public boolean login(String name, String passwd) {
+    public void login(String name, String passwd) {
         printer.printf("login.%s.%s\n", name, passwd);
         printer.flush();
-        return true;
     }
 
-    public boolean register(String name, String passwd) {
+    public void register(String name, String passwd) {
         printer.printf("register.%s.%s\n", name, passwd);
         printer.flush();
-        return true;
     }
 
     public void stop() {
@@ -97,7 +94,7 @@ public class ClientController implements Runnable {
                 controller.initial(selfColor == CIRCLE);
                 System.out.printf("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName);
                 AlertWindow.show(String.format("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName));
-                StartWindow.close();
+                UserListWindow.close();
                 Main.showGame();
                 break;
             case ("success"): //success.{playerID}
@@ -135,6 +132,12 @@ public class ClientController implements Runnable {
                     AlertWindow.show("Register failed");
                 }
                 break;
+            case("list"):
+                receiveList(Integer.parseInt(msg[1]));
+                break;
+            case("invite"):
+                InviteWindow.show(this, msg[1], msg[2]);
+                break;
         }
     }
 
@@ -148,12 +151,52 @@ public class ClientController implements Runnable {
         printer.flush();
     }
 
+    long time = 0;
+
+    public void getList() {
+        if (time == 0 || System.currentTimeMillis() - time > 1500) {
+            time = System.currentTimeMillis();
+            this.printer.println("getList");
+            this.printer.flush();
+        }
+    }
+
+    private void receiveList(int n) {
+        HashMap<String, String> users = new HashMap<>();
+        try {
+            for (int i = 0; i < n; i++) {
+                String entry = reader.readLine();
+                String[] entries = entry.split("\\."); // {name}.{uuid}
+                users.put(entries[0], entries[1]);
+            }
+        } catch (IOException e) {
+            System.out.println("socket error, receive list failed");
+        }
+        UserListWindow.setList(users);
+    }
+
+    public void invite(String opposite) {
+        printer.printf("invite.%s\n", opposite);
+        printer.flush();
+    }
+
+    public void accept(String invitorUUID) {
+        printer.printf("accept.%s\n", invitorUUID);
+        printer.flush();
+    }
+
+    public void reject(String invitorUUID) {
+        printer.printf("reject.%s\n", invitorUUID);
+        printer.flush();
+    }
+
     @Override
     public void run() {
         try {
             while (running) {
                 String in = reader.readLine();
 //                System.out.println(in);
+                if (in == null) continue;
                 resolve(in);
             }
         } catch (IOException e) {

@@ -29,6 +29,12 @@ public class AlertWindow {
         stage.show();
     }
 
+    public static void close() {
+        if (stageW != null){
+            Platform.runLater(() -> stageW.close());
+        }
+    }
+
     public static void show(String info) {
         if (stageW != null) {
             Platform.runLater(() -> stageW.close());

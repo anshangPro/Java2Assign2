@@ -16,10 +16,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class StartWindow {
+public class InviteWindow {
     private static Stage stageW;
 
-    private static void display(ClientController client) {
+    private static void display(ClientController client, String invitor, String uuid) {
         Stage stage = new Stage();
         stageW = stage;
         stage.initModality(Modality.WINDOW_MODAL);
@@ -29,32 +29,28 @@ public class StartWindow {
         gird.setHgap(10);
         gird.setPadding(new Insets(25, 25, 25, 25));
 
-        Text login = new Text("Welcome");
+        Text login = new Text(String.format("Invitation from %s", invitor));
         login.setFont(Font.font("Tahoma", 20));
         gird.add(login, 0, 0, 2, 1);
 
-        Label name = new Label("name:");
-        Text nameField = new Text(client.name);
-        Label winCnt = new Label("win cnt:");
-        Text winCntField = new Text(String.valueOf(client.winCnt));
-        Label gameCnt = new Label("total game cnt:");
-        Text gameCntField = new Text(String.valueOf(client.totalCnt));
-        gird.add(name, 0, 1);
-        gird.add(nameField, 1, 1);
-        gird.add(winCnt, 0, 2);
-        gird.add(winCntField, 1, 2);
-        gird.add(gameCnt, 0, 3);
-        gird.add(gameCntField, 1, 3);
-
-        Button start = new Button("Start game");
+        Button accept = new Button("Accept");
         HBox hb = new HBox(10);
         hb.setAlignment(Pos.BOTTOM_RIGHT);
-        hb.getChildren().add(start);
-        gird.add(hb, 1, 5);
+        hb.getChildren().add(accept);
+        gird.add(hb, 1, 3);
 
-        start.setOnAction((event) -> {
-            client.start();
-            UserListWindow.show(client);
+        Button reject = new Button("Reject");
+        HBox hb2 = new HBox(10);
+        hb2.setAlignment(Pos.BOTTOM_RIGHT);
+        hb2.getChildren().add(reject);
+        gird.add(hb2, 0, 3);
+
+        accept.setOnAction((event) -> {
+            client.accept(uuid);
+            close();
+        });
+        reject.setOnAction((event) -> {
+            client.reject(uuid);
             close();
         });
 
@@ -63,7 +59,7 @@ public class StartWindow {
         stage.setScene(scene);
         stage.setTitle("info");
         stage.setOnCloseRequest(event -> {
-            client.stop();
+            client.reject(uuid);
         });
         stage.show();
     }
@@ -72,10 +68,11 @@ public class StartWindow {
         Platform.runLater(() -> stageW.close());
     }
 
-    public static void show(ClientController clientController) {
+    public static void show(ClientController clientController, String invitor, String uuid) {
         if (stageW != null) {
             Platform.runLater(() -> stageW.close());
         }
-        Platform.runLater(() -> display(clientController));
+        AlertWindow.close();
+        Platform.runLater(() -> display(clientController, invitor, uuid));
     }
 }

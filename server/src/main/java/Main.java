@@ -8,8 +8,8 @@ public class Main {
         Server server = Server.getInstance();
         GameMatcher gameMatcher = GameMatcher.getInstance();
         Thread serverThread = new Thread(server);
-        Thread gameMatcherThread = new Thread(gameMatcher);
+//        Thread gameMatcherThread = new Thread(gameMatcher);
         serverThread.start();
-        gameMatcherThread.start();
+//        gameMatcherThread.start();
     }
 }

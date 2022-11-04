@@ -3,6 +3,7 @@ package application;
 import application.Controller.ClientController;
 import application.Controller.Controller;
 import application.View.LoginWindow;
+import application.View.UserListWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;

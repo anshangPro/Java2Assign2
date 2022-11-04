@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 
 import Serializable.User;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 
 public class ClientHandler implements Runnable{
 
@@ -65,7 +67,21 @@ public class ClientHandler implements Runnable{
             case("start"):
                 GameMatcher.addClient(this);
                 break;
+            case("getList"):
+                GameMatcher.getUserList(this);
+                break;
+            case("invite"):
+                GameMatcher.invite(msg[1], this);
+                break;
+            case("accept"):
+                GameMatcher.accept(msg[1], this);
+                break;
         }
+    }
+
+    public void isInvited(String name, String uuid) {
+        printer.printf("invite.%s.%s\n", name, uuid);
+        printer.flush();
     }
 
     private boolean login(String name, String passwd){
@@ -138,7 +154,12 @@ public class ClientHandler implements Runnable{
         try {
             while (true) {
                 String in = reader.readLine();
-                if (in == null) throw new IOException();
+                if (socket.isClosed() || !socket.isConnected()) {
+                    throw new IOException();
+                }
+                if (in == null) {
+                     throw new IOException();
+                }
 //                System.out.println(in);
                 read(in);
             }

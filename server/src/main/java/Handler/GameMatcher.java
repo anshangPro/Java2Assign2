@@ -1,14 +1,17 @@
 package Handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class GameMatcher implements Runnable {
+public class GameMatcher {
 
-    List<ClientHandler> clientList;
+    HashMap<UUID, ClientHandler> clientList;
 
     private GameMatcher() {
-        clientList = new ArrayList<>();
+        clientList = new HashMap<>();
     }
 
     private volatile static GameMatcher instance;
@@ -23,14 +26,47 @@ public class GameMatcher implements Runnable {
     }
 
     public static void addClient(ClientHandler client) {
-        instance.clientList.add(client);
+        instance.clientList.put(client.user.uuid, client);
     }
 
     public static void removeClient(ClientHandler client) {
-        instance.clientList.remove(client);
+        if (client.user != null) {
+            instance.clientList.remove(client.user.uuid);
+        }
     }
 
-    @Override
+    public static void getUserList(ClientHandler client) {
+        client.printer.printf("list.%d\n", instance.clientList.size()-1);
+        instance.clientList.forEach((key, value) -> {
+            if (client != value) { // {name}.{uuid}
+                client.printer.printf("%s.%s\n", value.name, key.toString());
+            }
+        });
+        client.printer.flush();
+    }
+
+    public static void invite(String uuid, ClientHandler client) {
+        UUID u = UUID.fromString(uuid);
+        ClientHandler opposite = instance.clientList.get(u);
+        opposite.isInvited(client.name, client.user.uuid.toString());
+    }
+
+    public static void accept(String uuid, ClientHandler client) {
+        UUID u = UUID.fromString(uuid);
+        ClientHandler opposite = instance.clientList.get(u);
+//        opposite.isAccepted(client.user.uuid.toString());
+        client.sendLine(String.format("start.%s.1", opposite.name));
+        opposite.sendLine(String.format("start.%s.2", client.name));
+        GameHandler game = new GameHandler(client, opposite);
+        client.color = 1;
+        opposite.color = 2;
+        client.setGameHandler(game);
+        opposite.setGameHandler(game);
+        removeClient(client);
+        removeClient(opposite);
+    }
+
+/*    @Override
     public void run() {
         try {
             while (true) {
@@ -50,9 +86,10 @@ public class GameMatcher implements Runnable {
                     }
                     Thread.sleep(1000);
                 }
+
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 }
