@@ -53,8 +53,7 @@ public class ClientHandler implements Runnable{
                 break;
             case("login"):
                 if (login(msg[1], msg[2])) {
-                    sendLine(String.format("login.success.%s", msg[1]));
-                    GameMatcher.addClient(this);
+                    sendLine(String.format("login.success.%s.%d.%d", msg[1], user.winCnt, user.totalCnt)); // login.success.{name}.{winCnt}.{totalCnt}
                     this.name = msg[1];
                 } else sendLine("login.fail");
                 break;
@@ -62,6 +61,9 @@ public class ClientHandler implements Runnable{
                 if (register(msg[1], msg[2]))
                     sendLine("register.success");
                 else sendLine("register.fail");
+                break;
+            case("start"):
+                GameMatcher.addClient(this);
                 break;
         }
     }
@@ -89,6 +91,7 @@ public class ClientHandler implements Runnable{
             String fileName = String.format("data/%s.o", name);
             File file = new File(fileName);
             if (!file.exists()) {
+                file.createNewFile();
                 User u = new User();
                 u.passwd = passwd;
                 u.name = name;
@@ -118,6 +121,18 @@ public class ClientHandler implements Runnable{
         printer.flush();
     }
 
+    public void save() {
+        try {
+            String fileName = String.format("data/%s.o", name);
+            File file = new File(fileName);
+            ObjectOutput out = new ObjectOutputStream(Files.newOutputStream(file.toPath()));
+            out.writeObject(user);
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -130,6 +145,7 @@ public class ClientHandler implements Runnable{
         } catch (IOException e) {
             if (gameHandler != null)  gameHandler.exit(color);
             GameMatcher.removeClient(this);
+            save();
             System.out.printf("Player: %s-%d exited\n", name, color);
         }
     }

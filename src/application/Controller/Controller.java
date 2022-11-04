@@ -48,7 +48,7 @@ public class Controller implements Initializable {
     }
 
     private boolean refreshBoard (int x, int y) {
-        if (!clientController.isStarted())
+        if (!clientController.isStarted() || clientController.finished)
             return false;
         if (chessBoard[x][y] == EMPTY) {
             if (TURN != (clientController.selfColor == 1)) return false;

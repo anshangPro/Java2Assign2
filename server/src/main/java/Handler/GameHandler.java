@@ -29,9 +29,20 @@ public class GameHandler {
         if (judge(player)) {
             a.sendLine(String.format("success.%d", player));
             b.sendLine(String.format("success.%d", player));
+            if (player == 1) {
+                a.user.winCnt++;
+                a.user.totalCnt++;
+                b.user.totalCnt++;
+            } else {
+                b.user.winCnt++;
+                b.user.totalCnt++;
+                a.user.totalCnt++;
+            }
         } else if (step == 9) {
             a.sendLine("tie");
             b.sendLine("tie");
+            a.user.totalCnt++;
+            b.user.totalCnt++;
         }
     }
 

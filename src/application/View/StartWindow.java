@@ -11,14 +11,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class LoginWindow {
-
+public class StartWindow {
     private static Stage stageW;
 
     private static void display(ClientController client) {
@@ -31,33 +29,37 @@ public class LoginWindow {
         gird.setHgap(10);
         gird.setPadding(new Insets(25, 25, 25, 25));
 
-        Text login = new Text("Please login");
+        Text login = new Text("Welcome");
         login.setFont(Font.font("Tahoma", 20));
         gird.add(login, 0, 0, 2, 1);
 
         Label name = new Label("name:");
-        TextField nameField = new TextField();
-        Label passwd = new Label("password:");
-        PasswordField passwordField = new PasswordField();
+        Text nameField = new Text(client.name);
+        Label winCnt = new Label("win cnt:");
+        Text winCntField = new Text(String.valueOf(client.winCnt));
+        Label gameCnt = new Label("total game cnt:");
+        Text gameCntField = new Text(String.valueOf(client.totalCnt));
         gird.add(name, 0, 1);
         gird.add(nameField, 1, 1);
-        gird.add(passwd, 0, 2);
-        gird.add(passwordField, 1, 2);
+        gird.add(winCnt, 0, 2);
+        gird.add(winCntField, 1, 2);
+        gird.add(gameCnt, 0, 3);
+        gird.add(gameCntField, 1, 3);
 
-        Button signIn = new Button("Sign in");
+        Button start = new Button("Start game");
         HBox hb = new HBox(10);
         hb.setAlignment(Pos.BOTTOM_RIGHT);
-        hb.getChildren().add(signIn);
-        gird.add(hb, 1, 4);
+        hb.getChildren().add(start);
+        gird.add(hb, 1, 5);
 
-        Button register = new Button("Register");
-        HBox hb2 = new HBox(10);
-        hb2.setAlignment(Pos.BOTTOM_RIGHT);
-        hb2.getChildren().add(register);
-        gird.add(hb2, 0, 4);
+//        Button register = new Button("Register");
+//        HBox hb2 = new HBox(10);
+//        hb2.setAlignment(Pos.BOTTOM_RIGHT);
+//        hb2.getChildren().add(register);
+//        gird.add(hb2, 0, 4);
 
-        signIn.setOnAction((event) -> client.login(nameField.getText(), passwordField.getText()));
-        register.setOnAction((event) -> client.register(nameField.getText(), passwordField.getText()));
+        start.setOnAction((event) -> client.start());
+//        register.setOnAction((event) -> client.register(nameField.getText(), passwordField.getText()));
 
         Scene scene = new Scene(gird, 300, 170);
 

@@ -1,6 +1,9 @@
 package application.Controller;
 
+import application.Main;
 import application.View.AlertWindow;
+import application.View.LoginWindow;
+import application.View.StartWindow;
 
 import java.io.*;
 import java.net.Socket;
@@ -10,8 +13,8 @@ public class ClientController implements Runnable {
     private static final int CIRCLE = 1;
     private static final int LINE = 2;
 
-    String name;
-    String oppositeName;
+    public String name;
+    public String oppositeName;
     int selfColor;
     int step;
     Socket socket;
@@ -20,6 +23,11 @@ public class ClientController implements Runnable {
     BufferedReader reader;
     PrintStream printer;
     private boolean running;
+    public boolean finished;
+
+
+    public int winCnt = 0;
+    public int totalCnt = 0;
 
     public boolean isStarted() {
         return started;
@@ -31,6 +39,7 @@ public class ClientController implements Runnable {
     public ClientController(String name, Controller controller) {
         running = true;
         started = false;
+        finished = false;
         try {
             this.name = name;
             this.controller = controller;
@@ -88,10 +97,13 @@ public class ClientController implements Runnable {
                 controller.initial(selfColor == CIRCLE);
                 System.out.printf("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName);
                 AlertWindow.show(String.format("Connected. self: %s, opposite: %s\n", this.selfColor, this.oppositeName));
+                StartWindow.close();
+                Main.showGame();
                 break;
             case ("success"): //success.{playerID}
 //                System.out.printf("Player: %s win\n", msg[1]);
                 AlertWindow.show(String.format("Player: %s win", msg[1]));
+                finished = true;
                 break;
             case ("exit"):
 //                System.out.println("opposite exited");
@@ -103,22 +115,36 @@ public class ClientController implements Runnable {
                 break;
             case ("tie"):
                 AlertWindow.show("Tie");
+                finished = true;
                 break;
             case ("login"):
                 if (msg[1].equals("success")){
                     this.name = msg[2];
-                    //TODO: inform close;
+                    this.winCnt = Integer.parseInt(msg[3]);
+                    this.totalCnt = Integer.parseInt(msg[4]);
+                    LoginWindow.close();
+                    StartWindow.show(this);
                 } else{
-                    //TODO: fail
+                    AlertWindow.show("Login failed");
                 }
                 break;
             case("register"):
+                if (msg[1].equals("success")){
+                    AlertWindow.show("Register success, please login");
+                } else{
+                    AlertWindow.show("Register failed");
+                }
                 break;
         }
     }
 
     public void play(boolean turn, int x, int y) {
         printer.printf("play.%d.%d.%d.%d\n", step++, (turn ? CIRCLE : LINE), x, y);
+        printer.flush();
+    }
+
+    public void start() {
+        printer.println("start");
         printer.flush();
     }
 
