@@ -55,6 +55,12 @@ public class ClientController implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("can not establish connection with server");
+            AlertWindow.show("can not establish connection with server");
+            AlertWindow.setOnExit((event) -> {
+                AlertWindow.close();
+                this.finished = true;
+                LoginWindow.close();
+            });
             running = false;
         }
     }
@@ -245,10 +251,22 @@ public class ClientController implements Runnable {
             while (running) {
                 String in = reader.readLine();
 //                System.out.println(in);
-                if (in == null) continue;
+                if (in == null) {
+                    throw new IOException();
+                }
                 resolve(in);
             }
         } catch (IOException e) {
+            AlertWindow.show("Disconnected from server");
+            AlertWindow.setOnExit(event -> {
+                AlertWindow.close();
+                this.running = false;
+                InviteWindow.close();
+                LoginWindow.close();
+                ResumeWindow.close();
+                StartWindow.close();
+                UserListWindow.close();
+            });
             System.out.println("socket closed");
         }
     }

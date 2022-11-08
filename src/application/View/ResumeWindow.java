@@ -60,7 +60,7 @@ public class ResumeWindow {
     }
 
     public static void close() {
-        Platform.runLater(() -> stageW.close());
+        if (stageW != null) Platform.runLater(() -> stageW.close());
     }
 
     public static void show(ClientController clientController) {
