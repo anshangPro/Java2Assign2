@@ -168,6 +168,7 @@ public class ClientController implements Runnable {
         try {
             boolean turn = reader.readLine().equals("1");
             selfColor = Integer.parseInt(reader.readLine());
+            oppositeName = reader.readLine();
             int[][] board = new int[3][3];
             boolean[][] flag = new boolean[3][3];
             int cnt = 0;

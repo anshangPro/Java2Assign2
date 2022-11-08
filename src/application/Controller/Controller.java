@@ -35,7 +35,7 @@ public class Controller implements Initializable {
 
     private ClientController clientController;
 
-    private static boolean TURN = false;
+    private volatile boolean TURN = false;
 
     private int[][] chessBoard = new int[3][3];
     private boolean[][] flag = new boolean[3][3];
@@ -58,6 +58,7 @@ public class Controller implements Initializable {
         if (!clientController.isStarted() || clientController.finished)
             return false;
         if (chessBoard[x][y] == EMPTY) {
+            System.out.printf("Turn: %s, color: %d\n", TURN, clientController.selfColor);
             if (TURN != (clientController.selfColor == 1)) return false;
             clientController.play(TURN, x, y);
             chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;

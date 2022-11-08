@@ -62,7 +62,7 @@ public class GameMatcher {
         client.color = 1;
         opposite.color = 2;
         client.user.color = 1;
-        opposite.user.color = 1;
+        opposite.user.color = 2;
         client.setGameHandler(game);
         opposite.setGameHandler(game);
         removeClient(client);

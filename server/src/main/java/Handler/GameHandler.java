@@ -73,18 +73,22 @@ public class GameHandler {
 
     public void resume(ClientHandler client) {
         exited = false;
+        String opposite;
         if (client.user.color == 1) {
             a = client;
             b.printer.println("reconnect");
             b.printer.flush();
+            opposite = b.name;
         } else {
             b = client;
             a.printer.println("reconnect");
             a.printer.flush();
+            opposite = a.name;
         }
         client.printer.println("resume");
         client.printer.println(turn ? "1" : "0");
         client.printer.println(client.user.color);
+        client.printer.println(opposite);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 client.printer.print(board[i][j]);

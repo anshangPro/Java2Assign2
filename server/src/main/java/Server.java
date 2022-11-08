@@ -34,7 +34,7 @@ public class Server implements Runnable {
         try (ServerSocket server = new ServerSocket(port)) {
             while (running) {
                 Socket socket = server.accept();
-                System.out.printf("Client connected at port: %d\n", socket.getLocalPort());
+                System.out.printf("Client connected at port: %d\n", socket.getPort());
                 ClientHandler client = new ClientHandler(socket);
                 Thread clientThread = new Thread(client);
                 clientThread.start();

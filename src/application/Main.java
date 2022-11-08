@@ -10,11 +10,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class Main extends Application {
     private static Stage stage;
+    private static Scene scene;
 
     @Override
     public void start(Stage primaryStage) {
@@ -28,7 +30,8 @@ public class Main extends Application {
             LoginWindow.show(client);
             controller.setClientController(client);
             primaryStage.setTitle("Tic Tac Toe");
-            primaryStage.setScene(new Scene(root));
+            scene = new Scene(root);
+            primaryStage.setScene(scene);
             primaryStage.setResizable(false);
 
             Thread clientThread = new Thread(client);
@@ -49,7 +52,10 @@ public class Main extends Application {
 
     public static void showGame(){
         if (stage != null) {
-            Platform.runLater(() -> stage.show());
+            Text text = new Text("Self: x\nOpposite: name\n");
+            Platform.runLater(() -> {
+                stage.show();
+            });
         }
     }
 
