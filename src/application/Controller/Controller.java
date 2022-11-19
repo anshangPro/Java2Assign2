@@ -58,7 +58,6 @@ public class Controller implements Initializable {
         if (!clientController.isStarted() || clientController.finished)
             return false;
         if (chessBoard[x][y] == EMPTY) {
-            System.out.printf("Turn: %s, color: %d\n", TURN, clientController.selfColor);
             if (TURN != (clientController.selfColor == 1)) return false;
             clientController.play(TURN, x, y);
             chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
