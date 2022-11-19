@@ -28,11 +28,21 @@ public class GameMatcher {
 
     public static void addClient(ClientHandler client) {
         instance.clientList.put(client.user.uuid, client);
+        instance.clientList.forEach((uuid, clientHandler) -> {
+            if (uuid != client.user.uuid) {
+                getUserList(clientHandler);
+            }
+        });
     }
 
     public static void removeClient(ClientHandler client) {
         if (client.user != null) {
             instance.clientList.remove(client.user.uuid);
+            instance.clientList.forEach((uuid, clientHandler) -> {
+                if (uuid != client.user.uuid) {
+                    getUserList(clientHandler);
+                }
+            });
         }
     }
 
